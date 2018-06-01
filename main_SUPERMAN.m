@@ -298,8 +298,7 @@ S.PTB = StartPTB;
 
 EchoStart(Task)
 
-sca
-return
+TaskData = SUPERMAN.Task(Category,Movie);
 
 EchoStop(Task)
 

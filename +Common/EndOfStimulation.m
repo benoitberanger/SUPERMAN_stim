@@ -1,25 +1,14 @@
-function TaskData = EndOfStimulation( TaskData, EP, ER, RR, KL, StartTime, StopTime )
+function TaskData = EndOfStimulation( TaskData, EP, ER, KL, SR, StartTime, StopTime )
 global S
 
 %% End of stimulation
 
-% EventRecorder
-% if size(EP.Data,2)>3
-%     EP.Data(:,4:end) = [];
-% end
 ER.ClearEmptyEvents;
 ER.ComputeDurations;
 ER.BuildGraph;
 ER.MakeBlocks;
 ER.BuildGraph('block');
 TaskData.ER = ER;
-
-% Response Recorder
-RR.ClearEmptyEvents;
-RR.ComputeDurations;
-% RR.MakeBlocks;
-RR.BuildGraph;
-TaskData.RR = RR;
 
 % KbLogger
 KL.GetQueue;
@@ -41,6 +30,9 @@ KL.ComputeDurations;
 KL.BuildGraph;
 TaskData.KL = KL;
 
+% SampleRecorder
+SR.ClearEmptySamples
+TaskData.SR = SR;
 
 % Save some values
 TaskData.StartTime = StartTime;
@@ -51,20 +43,15 @@ TaskData.StopTime  = StopTime;
 
 assignin('base','EP',EP)
 assignin('base','ER',ER)
-assignin('base','RR',RR)
 assignin('base','KL',KL)
-
+assignin('base','SR',SR)
 assignin('base','TaskData',TaskData)
 
 
 %% Close all audio devices
 
-if strcmp(S.Task,'STOPSIGNAL')
-    
-    % Close the audio device
-    PsychPortAudio('Close');
-    
-end
+% % Close the audio device
+% PsychPortAudio('Close');
 
 
 %% Close parallel port
