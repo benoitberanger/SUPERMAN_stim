@@ -611,7 +611,7 @@ else % Create the figure
     txt_categ_y = 0.85;
     txt_categ_h = 0.15;
     
-    list = ListMovies;
+    list = ListMovies();
     
     categName = fieldnames(list);
     nrCateg = length(categName);

@@ -3,7 +3,7 @@ function [ list , ext ]= ListMovies()
 ext = '.mp4';
 
 Cuisine = { 'Datcha'             ; 'Imbroisi'       };
-F1      = { 'Grand_Prix_Mexique' ; 'Grand_Prix_USA' };
+F1      = { 'Mexique_Grand_Prix' ; 'USA_Grand_Prix' };
 Nature  = { 'Smoky_mountain'     ; 'Yellowstone'    };
 
 %--------------------------------------------------------------------------
