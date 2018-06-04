@@ -4,7 +4,7 @@ global S
 %% End of stimulation
 
 ER.ClearEmptyEvents;
-ER.ComputeDurations;
+% ER.ComputeDurations; % not in this project
 ER.BuildGraph;
 ER.MakeBlocks;
 ER.BuildGraph('block');

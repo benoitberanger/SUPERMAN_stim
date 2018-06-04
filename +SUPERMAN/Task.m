@@ -17,12 +17,11 @@ try
     TaskData.movieinfo = movieinfo;
     
     SR = SampleRecorder( { 'time (s)', 'frame index' } , round(movieinfo.count*1.20) ); % ( duration of the task +20% )
-    frame_counter = 0;
     
     
     %% Tunning of the task
     
-    [ EP, Parameters ] = SUPERMAN.Planning(movieinfo);
+    [ EP, Parameters ]  = SUPERMAN.Planning(movieinfo);
     TaskData.Parameters = Parameters;
     
     % End of preparations
@@ -47,8 +46,15 @@ try
     
     %% Go !
     
+    frame_counter = 0;
+    
+    draw_dot      = 0;
+    dot_counter   = 0;
+    
     % Playback loop: Runs until end of movie or keypress:
     while 1
+        
+        frame_counter = frame_counter + 1;
         
         % Wait for next movie frame, retrieve texture handle to it
         tex = Screen('GetMovieImage', win, movie);
@@ -62,14 +68,46 @@ try
         % Draw the new texture immediately to screen:
         Screen('DrawTexture', win, tex);
         
+        % Need to draw dot ?
+        if any(frame_counter == Parameters.DotFrameOnset)
+            draw_dot = 2;
+            dot_counter = dot_counter + 1;
+        end
+        
+        if draw_dot
+            Screen('FrameOval', win, [0 0 0],             CenterRectOnPoint( Parameters.DotRect , Parameters.DotXY(dot_counter,1),Parameters.DotXY(dot_counter,2) ) , 1 ) % frame is 1 pixel thick
+            Screen('FillOval',  win, Parameters.DotColor, CenterRectOnPoint( Parameters.DotRect , Parameters.DotXY(dot_counter,1),Parameters.DotXY(dot_counter,2) )     )
+        end
         
         % Update display:
         flipOnset = Screen('Flip', win);
-        frame_counter = frame_counter + 1;
         SR.AddSample([flipOnset-StartTime frame_counter])
         
         % Release texture:
         Screen('Close', tex);
+        
+        % Store dot onset
+        if draw_dot == 2
+            dot_onset = flipOnset;
+            draw_dot = 1;
+            ER.AddEvent({'Dot' dot_onset-StartTime []})
+        end
+        
+        if draw_dot == 0 && dot_counter == length(Parameters.DotFrameOnset)
+            if strcmp(S.OperationMode,'FastDebug')
+                break
+            end
+        end
+        
+        % Only draw the dot for somes frames
+        if draw_dot
+            if flipOnset - dot_onset >= Parameters.DotDuration
+                
+                draw_dot = 0;
+                ER.Data{ER.EventCount,3} =  flipOnset - dot_onset; % adjust real dut duration
+
+            end
+        end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Fetch keys
@@ -95,8 +133,6 @@ try
     
     % Close movie:
     Screen('CloseMovie', movie);
-    
-    
     
     
     %% End of stimulation

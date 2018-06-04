@@ -25,7 +25,9 @@ end
 Parameters = struct; % init
 
 vect = linspace(1,nrFrames,S.Parameters.SUPERMAN.Dot.N + 2); vect = vect(2:end-1); % pick 10 time points
-vect = vect + 20*movieinfo.fps*(rand(1,S.Parameters.SUPERMAN.Dot.N) - 0.5); % add a random value from -20s to +20s
+if ~strcmp(S.OperationMode, 'FastDebug') % frame onset can be negative in case in FastDebug
+    vect = vect + 20*movieinfo.fps*(rand(1,S.Parameters.SUPERMAN.Dot.N) - 0.5); % add a random value from -20s to +20s
+end
 vect = round(vect);
 
 Parameters.DotFrameOnset = vect; % frame indext @ video speed
@@ -63,8 +65,14 @@ end
 
 
 % --- Stop ----------------------------------------------------------------
-
-EP.AddStopTime('StopTime',movieinfo.count/movieinfo.fps);
+switch S.OperationMode
+    case 'Acquisition'
+        EP.AddStopTime('StopTime',movieinfo.count/movieinfo.fps);
+    case 'FastDebug'
+        EP.AddStopTime('StopTime',NextOnset(EP));
+    case 'RealisticDebug'
+        EP.AddStopTime('StopTime',movieinfo.count/movieinfo.fps);
+end
 
 
 %% Compute gain when rewarded
