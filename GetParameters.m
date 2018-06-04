@@ -57,8 +57,12 @@ Parameters.Text.ClickCorlor = [0   255 0  ]; % [R G B] ( from 0 to 255 )
 % SUPERMAN %
 %%%%%%%%%%%%
 
-
-
+Parameters.SUPERMAN.Dot.N         = 10;        % 10 for 10min video means 1 per minute
+Parameters.SUPERMAN.Dot.SizeRatio = 0.03;      % Size = ScreenWide *ratio
+Parameters.SUPERMAN.Dot.Color     = [255 0 0]; % [R G B] ( from 0 to 255 )
+Parameters.SUPERMAN.Dot.Duration  = 100;       % milliseconds
+% right now videos are @25Hz, so 2 or 3 frames for screen @60Hz.
+% 100ms is 6 frames, a multiple of 2 and 3
 
 
 %%%%%%%%%%%%%%

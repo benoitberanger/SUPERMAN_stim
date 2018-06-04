@@ -4,9 +4,26 @@ global S
 TaskData = struct;
 
 try
+    %% Open movie
+    
+    moviename = fullfile(fileparts(pwd), 'video', Category, [Movie S.ext]);
+    TaskData.moviename = moviename;
+    
+    win = S.PTB.wPtr;
+    
+    % Open movie file:
+    [movie,movieinfo.duration,movieinfo.fps,movieinfo.width,movieinfo.height,movieinfo.count,movieinfo.aspectRatio]= ...
+        Screen('OpenMovie', win, moviename);
+    TaskData.movieinfo = movieinfo;
+    
+    SR = SampleRecorder( { 'time (s)', 'frame index' } , round(movieinfo.count*1.20) ); % ( duration of the task +20% )
+    frame_counter = 0;
+    
+    
     %% Tunning of the task
     
-    [ EP, Parameters ] = SUPERMAN.Planning;
+    [ EP, Parameters ] = SUPERMAN.Planning(movieinfo);
+    TaskData.Parameters = Parameters;
     
     % End of preparations
     EP.BuildGraph;
@@ -15,25 +32,9 @@ try
     [ ER, KL ] = Common.PrepareRecorders( EP );
     
     
-    %% Open movie
-    
-    moviename = fullfile(fileparts(pwd), 'video', Category, [Movie S.ext]);
-    
-    win = S.PTB.wPtr;
-    
-    % Open movie file:
-    [movie,info.duration,info.fps,info.width,info.height,info.count,info.aspectRatio]= ...
-        Screen('OpenMovie', win, moviename);
-    
-    
-    SR = SampleRecorder( { 'time (s)', 'frame index' } , round(info.count*1.20) ); % ( duration of the task +20% )
-    frame_counter = 0;
-    
-    
     %% Eyelink
     
     Common.StartRecordingEyelink
-    
     
     
     %% Wait for start
