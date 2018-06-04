@@ -16,7 +16,7 @@ try
             
         otherwise
             
-            names = {};
+            names = {'Dot'};
             
     end
     
@@ -34,19 +34,9 @@ try
         
         switch EventData{event,1}
             
-            case 'Repos'
+            case 'Dot'
                 onsets{1} = [onsets{1} ; EventData{event,2}];
-                
-            case 'Simple'
-                onsets{2} = [onsets{2} ; EventData{event,2}];
-            case 'Complexe'
-                onsets{3} = [onsets{3} ; EventData{event,2}];
-                
-            case 'Direct'
-                onsets{1} = [onsets{1} ; EventData{event,2}];
-            case 'Deviation'
-                onsets{2} = [onsets{2} ; EventData{event,2}];
-                
+
         end
         
     end
@@ -59,19 +49,9 @@ try
         
         switch EventData{event,1}
             
-            case 'Repos'
-                durations{1} = [ durations{1} ; EventData{event+1,2}-EventData{event,2}] ;
-                
-            case 'Simple'
-                durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;
-            case 'Complexe'
-                durations{3} = [ durations{3} ; EventData{event+1,2}-EventData{event,2}] ;
-                
-            case 'Direct'
-                durations{1} = [ durations{1} ; EventData{event+1,2}-EventData{event,2}] ;
-            case 'Deviation'
-                durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;
-                
+            case 'Dot'
+                durations{1} = [ durations{1} ; EventData{event,3}] ;
+                                
         end
         
     end
