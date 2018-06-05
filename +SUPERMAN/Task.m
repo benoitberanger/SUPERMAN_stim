@@ -42,6 +42,7 @@ try
     Screen('PlayMovie', movie, 1);
     
     StartTime = Common.StartTimeEvent();
+    Common.SendParPortMessage( 'Start' )
     
     
     %% Go !
@@ -88,6 +89,7 @@ try
         
         % Store dot onset
         if draw_dot == 2
+            Common.SendParPortMessage( 'Dot' )
             dot_onset = flipOnset;
             draw_dot = 1;
             ER.AddEvent({'Dot' dot_onset-StartTime []})
@@ -127,6 +129,8 @@ try
     
     
     %% Stop
+    
+    Common.SendParPortMessage( 'Stop' )
     
     % Stop playback:
     Screen('PlayMovie', movie, 0);
