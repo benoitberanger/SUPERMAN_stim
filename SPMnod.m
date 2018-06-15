@@ -12,7 +12,7 @@ try
     switch S.Task
         
         case 'EyelinkCalibration'
-            names = {};
+            names = {''};
             
         otherwise
             
