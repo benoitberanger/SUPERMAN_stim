@@ -57,6 +57,8 @@ try
     
     frame_counter = 0;
     
+    Cross.Draw
+    Cross.Flip
     StartTime = Common.StartTimeEvent();
     
     
@@ -75,6 +77,7 @@ try
         SR.AddSample([flipOnset-StartTime frame_counter])
         
         if frame_counter == 1
+            Common.SendParPortMessage( 'Cross' )
             ER.AddEvent({'Cross' flipOnset-StartTime []})
         end
         
@@ -99,7 +102,7 @@ try
     
     % Start playback engine:
     Screen('PlayMovie', movie, 1);
-    Common.SendParPortMessage( 'Start' )
+    Common.SendParPortMessage( 'MovieStart' )
     
     
     %% Go movie ! Go !
@@ -147,6 +150,7 @@ try
         % record Cross real duration
         if movie_frame_counter == 1
             ER.Data{ER.EventCount,3} = flipOnset - StartTime - ER.Data{ER.EventCount,2};
+            ER.AddEvent({'MovieStart' flipOnset-StartTime 0})
         end
         
         % Store dot onset
@@ -155,8 +159,10 @@ try
             dot_onset = flipOnset;
             draw_dot = 1;
             ER.AddEvent({'Dot' dot_onset-StartTime []})
+            fprintf('Dot @ %3.3fs \n', dot_onset-StartTime)
         end
         
+        % End of movie
         if draw_dot == 0 && dot_counter == length(Parameters.DotFrameOnset)
             if strcmp(S.OperationMode,'FastDebug')
                 break
@@ -182,6 +188,8 @@ try
             if keyCode(S.Parameters.Keybinds.Stop_Escape_ASCII)
                 fprintf( 'ESCAPE key pressed \n')
                 break
+            elseif keyCode(S.Parameters.Fingers.ID)
+                fprintf(' Tap @ %3.3fs \n', flipOnset-StartTime)
             end
             
         end
@@ -192,7 +200,8 @@ try
     
     %% Stop movie
     
-    Common.SendParPortMessage( 'Stop' )
+    Common.SendParPortMessage( 'MovieStop' )
+    ER.AddEvent({'MovieStop' flipOnset-StartTime 0})
     
     % Stop playback:
     Screen('PlayMovie', movie, 0);
@@ -217,6 +226,7 @@ try
         SR.AddSample([flipOnset-StartTime frame_counter])
         
         if rec
+            Common.SendParPortMessage( 'Cross' )
             ER.AddEvent({'Cross' flipOnset-StartTime []})
             rec = 0;
         end

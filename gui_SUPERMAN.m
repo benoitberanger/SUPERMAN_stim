@@ -5,7 +5,7 @@ function varargout = gui_SUPERMAN
 
 % debug=1 closes previous figure and reopens it, and send the gui handles
 % to base workspace.
-debug = 1;
+debug = 0;
 
 
 %% Open a singleton figure, or gring the actual into focus.
@@ -506,7 +506,7 @@ else % Create the figure
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    p_el_dw.nbO    = 3; % Number of objects
+    p_el_dw.nbO    = 4.5; % Number of objects
     p_el_dw.Ow     = 1/(p_el_dw.nbO + 1); % Object width
     p_el_dw.countO = 0; % Object counter
     p_el_dw.xposO  = @(countO) p_el_dw.Ow/(p_el_dw.nbO+1)*countO + (countO-1)*p_el_dw.Ow;
@@ -564,6 +564,25 @@ else % Create the figure
         'BackgroundColor',buttonBGcolor,...
         'Tag',b_cal.tag,...
         'Callback',@pushbutton_EyelinkCalibration_Callback);
+    
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : Download EL files according to the SubjectID
+    
+    p_el_dw.countO = p_el_dw.countO + 1;
+    b_cal.x   = p_el_dw.xposO(p_el_dw.countO);
+    b_cal.y   = p_el_dw.y ;
+    b_cal.w   = p_el_dw.Ow*1.5;
+    b_cal.h   = p_el_dw.h;
+    b_cal.tag = 'pushbutton_DownloadELfiles';
+    handles.(b_cal.tag) = uicontrol(handles.uipanel_EyelinkMode,...
+        'Style','pushbutton',...
+        'Units', 'Normalized',...
+        'Position',[b_cal.x b_cal.y b_cal.w b_cal.h],...
+        'String','Download files',...
+        'BackgroundColor',buttonBGcolor*0.9,...
+        'Tag',b_cal.tag,...
+        'Callback',@pushbutton_DownloadELfiles_Callback);
     
     
     % ---------------------------------------------------------------------
@@ -809,6 +828,7 @@ else % Create the figure
     fprintf('USB \n')
     fprintf('HHSC - 2x1 ? \n')
     fprintf('HID NAR BYGRT \n')
+    fprintf('Blue button in the right hand \n')
     fprintf('\n')
     fprintf('Keyboard :\n')
     fprintf('keys LeftArrow & RightArrow \n')
@@ -875,5 +895,26 @@ SelectedDisplay = get(handles.listbox_Screens,'Value');
 wPtr = str2double( AvalableDisplays(SelectedDisplay) );
 
 Eyelink.OpenCalibration(wPtr);
+
+end % function
+
+% -------------------------------------------------------------------------
+function pushbutton_DownloadELfiles_Callback(hObject, ~)
+handles = guidata(hObject);
+
+SubjectID = get(handles.edit_SubjectID,'String');
+if isempty(SubjectID)
+    warning('SubjectID:Empty','SubjectID is empty')
+    return
+end
+
+DataPath = [fileparts(pwd) filesep 'data' filesep SubjectID filesep];
+el_file = [DataPath 'eyelink_files_to_download.txt'];
+
+if ~exist(el_file,'file')
+    error('File does not exists : %s', el_file)
+end
+
+Eyelink.downloadELfiles(DataPath)
 
 end % function

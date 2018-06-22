@@ -64,7 +64,9 @@ EP.AddStartTime('StartTime',0);
 
 % --- Stim ----------------------------------------------------------------
 
-EP.AddPlanning({ 'Cross' 0 Parameters.CrossDuration});
+EP.AddPlanning({ 'Cross' NextOnset(EP) Parameters.CrossDuration});
+
+EP.AddPlanning({ 'MovieStart' NextOnset(EP) 0});
 videoStart = NextOnset(EP);
 
 for d = 1 : S.Parameters.SUPERMAN.Dot.N
@@ -73,23 +75,24 @@ end
 
 switch S.OperationMode
     case 'Acquisition'
-        EP.AddPlanning({ 'Cross' (movieinfo.count+1)/movieinfo.fps Parameters.CrossDuration});
+        EP.AddPlanning({ 'MovieStop' videoStart+movieinfo.count/movieinfo.fps 0});
     case 'FastDebug'
-        EP.AddPlanning({ 'Cross' NextOnset(EP) Parameters.CrossDuration});
+        EP.AddPlanning({ 'MovieStop' NextOnset(EP) 0});
     case 'RealisticDebug'
-        EP.AddPlanning({ 'Cross' (movieinfo.count+1)/movieinfo.fps Parameters.CrossDuration});
+        EP.AddPlanning({ 'MovieStop' videoStart+movieinfo.count/movieinfo.fps 0});
 end
 
+EP.AddPlanning({ 'Cross' NextOnset(EP) Parameters.CrossDuration});
 
 % --- Stop ----------------------------------------------------------------
 
 switch S.OperationMode
     case 'Acquisition'
-        EP.AddStopTime('StopTime',movieinfo.count/movieinfo.fps);
+        EP.AddStopTime('StopTime',NextOnset(EP));
     case 'FastDebug'
         EP.AddStopTime('StopTime',NextOnset(EP));
     case 'RealisticDebug'
-        EP.AddStopTime('StopTime',movieinfo.count/movieinfo.fps);
+        EP.AddStopTime('StopTime',NextOnset(EP));
 end
 
 
