@@ -16,7 +16,10 @@ try
             
         otherwise
             
-            names = {'Dot'};
+            names = {
+                'Cross'
+                'Dot'
+                };
             
     end
     
@@ -34,8 +37,11 @@ try
         
         switch EventData{event,1}
             
-            case 'Dot'
+            case 'Cross'
                 onsets{1} = [onsets{1} ; EventData{event,2}];
+                
+            case 'Dot'
+                onsets{2} = [onsets{2} ; EventData{event,2}];
 
         end
         
@@ -49,8 +55,11 @@ try
         
         switch EventData{event,1}
             
-            case 'Dot'
+            case 'Cross'
                 durations{1} = [ durations{1} ; EventData{event,3}] ;
+            
+            case 'Dot'
+                durations{2} = [ durations{2} ; EventData{event,3}] ;
                                 
         end
         

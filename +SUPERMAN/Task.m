@@ -4,6 +4,23 @@ global S
 TaskData = struct;
 
 try
+    %% Fixation cross
+    
+    dim   = round(S.PTB.wRect(4)*S.Parameters.SUPERMAN.FixationCross.ScreenRatio);
+    width = round(dim * S.Parameters.SUPERMAN.FixationCross.lineWidthRatio);
+    color = S.Parameters.SUPERMAN.FixationCross.Color;
+    
+    Cross = FixationCross(...
+        dim   ,...                       % dimension in pixels
+        width ,...                       % width     in pixels
+        color ,...                       % color     [R G B] 0-255
+        [S.PTB.CenterH S.PTB.CenterV] ); % center    in pixels
+    
+    Cross.LinkToWindowPtr( S.PTB.wPtr )
+    
+    Cross.AssertReady % just to check
+    
+    
     %% Open movie
     
     moviename = fullfile(fileparts(pwd), 'video', Category, [Movie S.ext]);
@@ -38,24 +55,64 @@ try
     
     %% Wait for start
     
-    % Start playback engine:
-    Screen('PlayMovie', movie, 1);
+    frame_counter = 0;
     
     StartTime = Common.StartTimeEvent();
+    
+    
+    %% Fixation Cross
+    
+    flipOnset = StartTime;
+    
+    while flipOnset < StartTime + Parameters.CrossDuration - S.PTB.slack
+        
+        frame_counter = frame_counter + 1;
+        
+        Cross.Draw
+        
+        % Update display:
+        flipOnset = Screen('Flip', win);
+        SR.AddSample([flipOnset-StartTime frame_counter])
+        
+        if frame_counter == 1
+            ER.AddEvent({'Cross' flipOnset-StartTime []})
+        end
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Fetch keys
+        [keyIsDown, ~, keyCode] = KbCheck;
+        if keyIsDown
+            % ~~~ ESCAPE key ? ~~~
+            
+            if keyCode(S.Parameters.Keybinds.Stop_Escape_ASCII)
+                fprintf( 'ESCAPE key pressed \n')
+                break
+            end
+            
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+    end
+    
+    
+    %% Start movie
+    
+    % Start playback engine:
+    Screen('PlayMovie', movie, 1);
     Common.SendParPortMessage( 'Start' )
     
     
-    %% Go !
-    
-    frame_counter = 0;
+    %% Go movie ! Go !
     
     draw_dot      = 0;
     dot_counter   = 0;
+    movie_frame_counter = 0;
     
     % Playback loop: Runs until end of movie or keypress:
     while 1
         
         frame_counter = frame_counter + 1;
+        movie_frame_counter = movie_frame_counter + 1;
         
         % Wait for next movie frame, retrieve texture handle to it
         tex = Screen('GetMovieImage', win, movie);
@@ -70,7 +127,7 @@ try
         Screen('DrawTexture', win, tex);
         
         % Need to draw dot ?
-        if any(frame_counter == Parameters.DotFrameOnset)
+        if any(movie_frame_counter == Parameters.DotFrameOnset)
             draw_dot = 2;
             dot_counter = dot_counter + 1;
         end
@@ -82,10 +139,15 @@ try
         
         % Update display:
         flipOnset = Screen('Flip', win);
-        SR.AddSample([flipOnset-StartTime frame_counter])
+        SR.AddSample([flipOnset-StartTime movie_frame_counter])
         
         % Release texture:
         Screen('Close', tex);
+        
+        % record Cross real duration
+        if movie_frame_counter == 1
+            ER.Data{ER.EventCount,3} = flipOnset - StartTime - ER.Data{ER.EventCount,2};
+        end
         
         % Store dot onset
         if draw_dot == 2
@@ -107,7 +169,7 @@ try
                 
                 draw_dot = 0;
                 ER.Data{ER.EventCount,3} =  flipOnset - dot_onset; % adjust real dut duration
-
+                
             end
         end
         
@@ -128,7 +190,7 @@ try
     end
     
     
-    %% Stop
+    %% Stop movie
     
     Common.SendParPortMessage( 'Stop' )
     
@@ -139,9 +201,47 @@ try
     Screen('CloseMovie', movie);
     
     
+    %% Fixation Cross
+    
+    lastFrameOnset = flipOnset;
+    rec = 1;
+    
+    while flipOnset < lastFrameOnset + Parameters.CrossDuration - S.PTB.slack
+        
+        frame_counter = frame_counter + 1;
+        
+        Cross.Draw
+        
+        % Update display:
+        flipOnset = Screen('Flip', win);
+        SR.AddSample([flipOnset-StartTime frame_counter])
+        
+        if rec
+            ER.AddEvent({'Cross' flipOnset-StartTime []})
+            rec = 0;
+        end
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Fetch keys
+        [keyIsDown, ~, keyCode] = KbCheck;
+        if keyIsDown
+            % ~~~ ESCAPE key ? ~~~
+            
+            if keyCode(S.Parameters.Keybinds.Stop_Escape_ASCII)
+                fprintf( 'ESCAPE key pressed \n')
+                break
+            end
+            
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+    end
+    
+    
     %% End of stimulation
     
-    StopTime = flipOnset;
+    StopTime = Screen('Flip', win); % Flip screen : grey screen
+    ER.Data{ER.EventCount,3} = StopTime - StartTime - ER.Data{ER.EventCount,2}; % adjust last fixation real duration
     
     Common.StopTimeEvent( ER, StartTime, StopTime )
     

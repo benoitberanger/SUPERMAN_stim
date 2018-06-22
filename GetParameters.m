@@ -58,6 +58,7 @@ Parameters.Text.ClickCorlor = [0   255 0  ]; % [R G B] ( from 0 to 255 )
 % SUPERMAN %
 %%%%%%%%%%%%
 
+% Video
 Parameters.SUPERMAN.Dot.N         = 10;          % 10 for 10min video means 1 per minute
 Parameters.SUPERMAN.Dot.SizeRatio = 5/100;       % Size = ScreenWide *ratio
 Parameters.SUPERMAN.Dot.Color     = [255 0 255]; % [R G B] ( from 0 to 255 )
@@ -65,6 +66,10 @@ Parameters.SUPERMAN.Dot.Duration  = 250;         % milliseconds
 % right now videos are @25Hz, so 2 or 3 frames for screen @60Hz.
 % 100ms is 6 frames, a multiple of 2 and 3
 
+% Fixation cross
+Parameters.SUPERMAN.FixationCross.ScreenRatio    = 0.10;          % ratio : dim   = ScreenWide *ratio_screen
+Parameters.SUPERMAN.FixationCross.lineWidthRatio = 0.05;          % ratio : width = dim        *ratio_width
+Parameters.SUPERMAN.FixationCross.Color          = [0 0 0]; % [R G B] ( from 0 to 255 )
 
 %%%%%%%%%%%%%%
 %  Keybinds  %
