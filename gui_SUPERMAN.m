@@ -5,7 +5,7 @@ function varargout = gui_SUPERMAN
 
 % debug=1 closes previous figure and reopens it, and send the gui handles
 % to base workspace.
-debug = 0;
+debug = 1;
 
 
 %% Open a singleton figure, or gring the actual into focus.
@@ -308,7 +308,7 @@ else % Create the figure
     p_pplr.h = panelProp.unitWidth*panelProp.vect(panelProp.countP);
     
     handles.uipanel_LeftRight = uibuttongroup(handles.(mfilename),...
-        'Title','Which side for YES :',...
+        'Title','Which side for button response :',...
         'Units', 'Normalized',...
         'Position',[p_pplr.x p_pplr.y p_pplr.w p_pplr.h],...
         'BackgroundColor',figureBGcolor);
@@ -336,7 +336,7 @@ else % Create the figure
         'HorizontalAlignment','Center',...
         'Tag',r_left.tag,...
         'BackgroundColor',figureBGcolor,...
-        'Tooltip','YES will bo on the LEFT side');
+        'Tooltip','');
     
     
     % ---------------------------------------------------------------------
@@ -356,7 +356,7 @@ else % Create the figure
         'HorizontalAlignment','Center',...
         'Tag',r_right.tag,...
         'BackgroundColor',figureBGcolor,...
-        'Tooltip','YES will bo on the RIGHT side');
+        'Tooltip','');
     
     
     %% Panel : Eyelink mode
@@ -563,7 +563,7 @@ else % Create the figure
         'String','Calibration',...
         'BackgroundColor',buttonBGcolor,...
         'Tag',b_cal.tag,...
-        'Callback',@main_SUPERMAN);
+        'Callback',@pushbutton_EyelinkCalibration_Callback);
     
     
     % ---------------------------------------------------------------------
@@ -597,7 +597,7 @@ else % Create the figure
         'Position',[p_tk.x p_tk.y p_tk.w p_tk.h],...
         'BackgroundColor',figureBGcolor);
     
-    p_tk.nbO    = 3; % Number of objects
+    p_tk.nbO    = 4; % Number of objects
     p_tk.Ow     = 1/(p_tk.nbO + 1); % Object width
     p_tk.countO = 0; % Object counter
     p_tk.xposO  = @(countO) p_tk.Ow/(p_tk.nbO+1)*countO + (countO-1)*p_tk.Ow;
@@ -678,7 +678,27 @@ else % Create the figure
         
     end
     
+    p_tk.countO  = p_tk.countO + 1;
     
+    % -----------------------------------------------------------------
+        % Pushbutton : RestingState
+        
+        b_task(c).x   = p_tk.xposO(p_tk.countO);
+        b_task(c).y   = button_y1;
+        b_task(c).w   = p_tk.Ow;
+        b_task(c).h   = button_h1 + button_h2;
+        b_task(c).tag = 'pushbutton_RestingState';
+        handles.(b_task(c).tag) = uicontrol(handles.uipanel_Task,...
+            'Style','pushbutton',...
+            'Units', 'Normalized',...
+            'Position',[b_task(c).x b_task(c).y b_task(c).w b_task(c).h],...
+            'String','RestingState',...
+            'BackgroundColor',buttonBGcolor,...
+            'Tag',b_task(c).tag,...
+            'Callback',@main_SUPERMAN,...
+            'Tooltip','RestingState : only fixation cross (+ eyetracker)');
+    
+        
     %% Panel : Operation mode
     
     p_op.x = panelProp.xposP;
@@ -760,6 +780,13 @@ else % Create the figure
         'BackgroundColor',figureBGcolor);
     
     
+    %% Opening sub-routine/setup
+    
+    % Only use Right buttons
+    set(handles.uipanel_LeftRight,'SelectedObject',handles.radiobutton_RightButtons) % select right switch
+    set(handles.radiobutton_LeftButtons,'Visible','off') % make invisible the left switch
+    
+    
     %% End of opening
     
     % IMPORTANT
@@ -834,5 +861,19 @@ switch get(eventdata.NewValue,'Tag') % Get Tag of selected object.
         set(handles.pushbutton_ForceShutDown     ,'Visible','on')
         set(handles.pushbutton_Initialize        ,'Visible','on')
 end
+
+end % function
+
+
+% -------------------------------------------------------------------------
+function pushbutton_EyelinkCalibration_Callback(hObject, ~)
+handles = guidata(hObject);
+
+% Screen mode selection
+AvalableDisplays = get(handles.listbox_Screens,'String');
+SelectedDisplay = get(handles.listbox_Screens,'Value');
+wPtr = str2double( AvalableDisplays(SelectedDisplay) );
+
+Eyelink.OpenCalibration(wPtr);
 
 end % function

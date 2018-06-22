@@ -34,40 +34,28 @@ S.TimeStampFile = datestr(now, 30                ); % to sort automatically by t
 
 %% GUI : Task selection
 
-switch get(hObject,'Tag')
-    
-    case 'pushbutton_EyelinkCalibration'
-        Task = 'EyelinkCalibration';
-        
-        Category = 'eyelink';
-        Movie = 'calibration';
-        
-    otherwise
-        
-        [ list , ext ]= ListMovies();
-        categName = fieldnames(list);
-        % nrCateg = length(categName);
-        
-        tasktag = get(hObject,'Tag');
-        tasktag = regexprep(tasktag,'pushbutton_','');
-        
-        res = regexp(tasktag,'_','split','once');
-        
-        resCat = regexp(res{1},categName);
-        Category = categName{~cellfun(@isempty,resCat)};
-        
-        resMov = regexp(res{2},list.(Category));
-        Movie  = list.(Category){~cellfun(@isempty,resMov)};
-        
-        
-        S.Category = Category;
-        S.Movie    = Movie;
-        S.ext      = ext;
-        
-        Task   = tasktag;
-        S.Task = tasktag;
-        
-end
+[ list , ext ]= ListMovies();
+categName = fieldnames(list);
+% nrCateg = length(categName);
+
+tasktag = get(hObject,'Tag');
+tasktag = regexprep(tasktag,'pushbutton_','');
+
+res = regexp(tasktag,'_','split','once');
+
+resCat = regexp(res{1},categName);
+Category = categName{~cellfun(@isempty,resCat)};
+
+resMov = regexp(res{2},list.(Category));
+Movie  = list.(Category){~cellfun(@isempty,resMov)};
+
+
+S.Category = Category;
+S.Movie    = Movie;
+S.ext      = ext;
+
+Task   = tasktag;
+S.Task = tasktag;
 
 
 %% GUI : Environement selection
@@ -310,17 +298,7 @@ S.PTB = StartPTB;
 
 EchoStart(Task)
 
-switch Task
-        
-    case 'EyelinkCalibration'
-        Eyelink.Calibration( S.PTB.wPtr );
-        TaskData.ER.Data = {};
-        TaskData.IsEyelinkRreadyToRecord = 1;
-        
-    otherwise
-        
-        TaskData = SUPERMAN.Task(Category,Movie);
-end
+TaskData = SUPERMAN.Task(Category,Movie);
 
 EchoStop(Task)
 
@@ -329,7 +307,7 @@ S.TaskData = TaskData;
 
 %% MAIN : Save files on the fly : just a security in case of crash of the end the script
 
-save([fileparts(pwd) filesep 'data' filesep 'LastS'],'S');
+save(fullfile(fileparts(pwd),'data','LastS'),'S');
 
 
 %% MAIN : Close PTB
