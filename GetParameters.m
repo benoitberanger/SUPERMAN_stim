@@ -71,6 +71,13 @@ Parameters.SUPERMAN.FixationCross.ScreenRatio    = 0.10;          % ratio : dim 
 Parameters.SUPERMAN.FixationCross.lineWidthRatio = 0.05;          % ratio : width = dim        *ratio_width
 Parameters.SUPERMAN.FixationCross.Color          = [0 0 0]; % [R G B] ( from 0 to 255 )
 
+%%%%%%%%%%%%%%%%
+% RestingState %
+%%%%%%%%%%%%%%%%
+
+% Fixation cross
+Parameters.RestingState = Parameters.SUPERMAN;
+
 %%%%%%%%%%%%%%
 %  Keybinds  %
 %%%%%%%%%%%%%%

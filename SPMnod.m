@@ -14,6 +14,9 @@ try
         case 'EyelinkCalibration'
             names = {''};
             
+        case 'RestingState'
+            names = {''};
+            
         otherwise
             
             names = {

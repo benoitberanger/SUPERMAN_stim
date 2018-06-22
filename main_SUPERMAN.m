@@ -41,14 +41,22 @@ categName = fieldnames(list);
 tasktag = get(hObject,'Tag');
 tasktag = regexprep(tasktag,'pushbutton_','');
 
-res = regexp(tasktag,'_','split','once');
-
-resCat = regexp(res{1},categName);
-Category = categName{~cellfun(@isempty,resCat)};
-
-resMov = regexp(res{2},list.(Category));
-Movie  = list.(Category){~cellfun(@isempty,resMov)};
-
+if strcmp(tasktag,'RestingState')
+    
+    Category = 'Resting';
+    Movie    = 'State';
+    
+else
+    
+    res = regexp(tasktag,'_','split','once');
+    
+    resCat = regexp(res{1},categName);
+    Category = categName{~cellfun(@isempty,resCat)};
+    
+    resMov = regexp(res{2},list.(Category));
+    Movie  = list.(Category){~cellfun(@isempty,resMov)};
+    
+end
 
 S.Category = Category;
 S.Movie    = Movie;
@@ -298,7 +306,11 @@ S.PTB = StartPTB;
 
 EchoStart(Task)
 
-TaskData = SUPERMAN.Task(Category,Movie);
+if strcmp(Task, 'RestingState')
+    TaskData = RestingState.Task;
+else
+    TaskData = SUPERMAN.Task(Category,Movie);
+end
 
 EchoStop(Task)
 

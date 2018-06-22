@@ -60,6 +60,7 @@ try
     Cross.Draw
     Cross.Flip
     StartTime = Common.StartTimeEvent();
+    ffprintf('... Trigger received \n')
     
     
     %% Fixation Cross
@@ -102,7 +103,6 @@ try
     
     % Start playback engine:
     Screen('PlayMovie', movie, 1);
-    Common.SendParPortMessage( 'MovieStart' )
     
     
     %% Go movie ! Go !
@@ -149,6 +149,7 @@ try
         
         % record Cross real duration
         if movie_frame_counter == 1
+            Common.SendParPortMessage( 'MovieStart' )
             ER.Data{ER.EventCount,3} = flipOnset - StartTime - ER.Data{ER.EventCount,2};
             ER.AddEvent({'MovieStart' flipOnset-StartTime 0})
         end
