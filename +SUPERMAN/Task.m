@@ -127,7 +127,7 @@ try
         end
         
         % Draw the new texture immediately to screen:
-        Screen('DrawTexture', win, tex);
+        Screen('DrawTexture', win, tex, [], S.PTB.wRect);
         
         % Need to draw dot ?
         if any(movie_frame_counter == Parameters.DotFrameOnset)
