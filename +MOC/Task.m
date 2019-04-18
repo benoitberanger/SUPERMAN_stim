@@ -45,8 +45,34 @@ try
     movie_frame_counter = 0;
     flipOnset = 0;
     
+    % censoring
+    
+    %     lpf = 5;
+    
+    X  = S.data.trial{1}(2,:);
+    Y  = S.data.trial{1}(3,:);
     PD = S.data.trial{1}(4,:);
+    
+    %     X  = ft_preproc_lowpassfilter(X ,1000,lpf);
+    %     Y  = ft_preproc_lowpassfilter(Y ,1000,lpf);
+    %     PD = ft_preproc_lowpassfilter(PD,1000,lpf);
+    
+    %     rep_idx = find(abs(gradient(PD == 0)) > 0);
+    %     for i = 1 : length(rep_idx)
+    %         window = rep_idx(i)-10:rep_idx(i)+10;
+    %         window(window<0) = [];
+    %         window(window>S.data.sampleinfo(2));
+    %         PD(window) = NaN;
+    %         X(window) = NaN;
+    %         Y(window) = NaN;
+    %     end
+    %     PD( PD == 0 ) = NaN;
+    %     PD = PD - min(PD(PD>0));
     PD = PD / max(PD) * Parameters.DotRect(3);
+    PD = abs(PD);
+    %     figure
+    %     plot(S.data.time{1},PD)
+    %     drawnow
     
     % Playback loop: Runs until end of movie or keypress:
     while 1
@@ -76,8 +102,12 @@ try
             Screen('FrameOval', win, [0 0 0],             CenterRectOnPoint( Parameters.DotRect , Parameters.DotXY(dot_counter,1),Parameters.DotXY(dot_counter,2) ) , 1 ) % frame is 1 pixel thick
         end
         
-        [~,idx] = min(abs(flipOnset - StartTime - S.data.time{1})); % time synchro
-        Screen('FillOval',  win, [0 255 0], CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , S.data.trial{1}(2,idx), S.data.trial{1}(3,idx))     )
+        time_in_seconds = flipOnset - StartTime;
+        
+        DrawFormattedText(win, sprintf('%d',round(time_in_seconds)),30,30,[255 0 0]);
+        
+        [~,idx] = min(abs(time_in_seconds - S.data.time{1})); % time synchro
+        Screen('FillOval',  win, [0 255 0], CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , X(idx), Y(idx))     )
         
         % Update display:
         flipOnset = Screen('Flip', win);

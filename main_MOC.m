@@ -56,7 +56,12 @@ fprintf('Loading .asc file : %s \n', ascfile)
 
 data  = ft_preprocessing(cfg);
 event = ft_read_event(ascfile);
-start_evt_idx = [ event.value ] == S.ParPortMessages.Start;
+if isfield(S.ParPortMessages,'Start')
+    target_message = 'Start';
+elseif isfield(S.ParPortMessages,'MovieStart')
+    target_message = 'MovieStart';
+end
+start_evt_idx = [ event.value ] == S.ParPortMessages.(target_message);
 start_sample = event(start_evt_idx).sample;
 
 % cut
