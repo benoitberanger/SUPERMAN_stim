@@ -68,8 +68,12 @@ try
     %     end
     %     PD( PD == 0 ) = NaN;
     %     PD = PD - min(PD(PD>0));
-    PD = PD / max(PD) * Parameters.DotRect(3);
-    PD = abs(PD);
+    PD = PD / max(abs(PD)) * Parameters.DotRect(3);
+    
+    cmap = round(gray(Parameters.DotRect(3))*255);
+    median_color_idx = round(median(PD));
+    
+%     PD = abs(PD);
     %     figure
     %     plot(S.data.time{1},PD)
     %     drawnow
@@ -103,11 +107,18 @@ try
         end
         
         time_in_seconds = flipOnset - StartTime;
-        
-        DrawFormattedText(win, sprintf('%d',round(time_in_seconds)),30,30,[255 0 0]);
-        
         [~,idx] = min(abs(time_in_seconds - S.data.time{1})); % time synchro
-        Screen('FillOval',  win, [0 255 0], CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , X(idx), Y(idx))     )
+        
+        Screen('FillOval' ,  win, cmap(round(max(PD(idx),1)),:), CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , X(idx), Y(idx)) )
+        Screen('FrameOval',  win, cmap(median_color_idx,:)     , CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , X(idx), Y(idx)) , 4)
+        Screen('FillOval' ,  win, [0 255 0], CenterRectOnPoint( [0 0 2 2] , X(idx), Y(idx))     )
+        
+        Screen('FillOval' ,  win, cmap(round(max(PD(idx),1)),:), CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , 60, 100) )
+        Screen('FrameOval',  win, cmap(median_color_idx,:)     , CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , 60, 100) , 4)
+        Screen('FillOval' ,  win, [0 255 0], CenterRectOnPoint( [0 0 2 2] , 60, 100)     )
+        
+        DrawFormattedText(win, sprintf('t=%ds',round(time_in_seconds)),30,30,[255 0 0]);
+        DrawFormattedText(win, sprintf('pd=%d',round(PD(idx))),30,60,[0 255 0]);
         
         % Update display:
         flipOnset = Screen('Flip', win);
