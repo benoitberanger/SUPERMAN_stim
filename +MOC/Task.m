@@ -71,7 +71,7 @@ try
     PD = PD / max(abs(PD)) * Parameters.DotRect(3);
     
     cmap = round(gray(Parameters.DotRect(3))*255);
-    median_color_idx = round(median(PD));
+    median_color_idx = round(median(PD(PD>0)));
     
 %     PD = abs(PD);
     %     figure
@@ -110,11 +110,11 @@ try
         [~,idx] = min(abs(time_in_seconds - S.data.time{1})); % time synchro
         
         Screen('FillOval' ,  win, cmap(round(max(PD(idx),1)),:), CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , X(idx), Y(idx)) )
-        Screen('FrameOval',  win, cmap(median_color_idx,:)     , CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , X(idx), Y(idx)) , 4)
+        Screen('FrameOval',  win, cmap(median_color_idx,:)     , CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , X(idx), Y(idx)) , round(Parameters.DotRect(3)/10))
         Screen('FillOval' ,  win, [0 255 0], CenterRectOnPoint( [0 0 2 2] , X(idx), Y(idx))     )
         
         Screen('FillOval' ,  win, cmap(round(max(PD(idx),1)),:), CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , 60, 100) )
-        Screen('FrameOval',  win, cmap(median_color_idx,:)     , CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , 60, 100) , 4)
+        Screen('FrameOval',  win, cmap(median_color_idx,:)     , CenterRectOnPoint( [0 0 PD(idx) PD(idx)] , 60, 100) , round(Parameters.DotRect(3)/10))
         Screen('FillOval' ,  win, [0 255 0], CenterRectOnPoint( [0 0 2 2] , 60, 100)     )
         
         DrawFormattedText(win, sprintf('t=%ds',round(time_in_seconds)),30,30,[255 0 0]);
